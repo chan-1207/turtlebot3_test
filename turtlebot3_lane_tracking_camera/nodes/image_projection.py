@@ -7,26 +7,27 @@ import numpy as np
 import cv2
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge
-from rclpy.parameter import Parameter
 from rcl_interfaces.msg import ParameterDescriptor, IntegerRange, SetParametersResult
+
 
 class ImageProjection(Node):
     def __init__(self):
         super().__init__('image_projection')
-        
         parameter_descriptor_top = ParameterDescriptor(
             description='projection range top.',
-            integer_range=[IntegerRange(
-                from_value = 0,
-                to_value = 120,
-                step = 1)]
+            integer_range=[
+                IntegerRange(
+                    from_value=0,
+                    to_value=120,
+                    step=1)]
         )
         parameter_descriptor_bottom = ParameterDescriptor(
             description='projection range top.',
-            integer_range=[IntegerRange(
-                from_value = 0,
-                to_value = 320,
-                step = 1)]
+            integer_range=[
+                IntegerRange(
+                    from_value=0,
+                    to_value=320,
+                    step=1)]
         )
         # 파라미터 선언 및 기본값 설정
         self.declare_parameters(
@@ -40,12 +41,17 @@ class ImageProjection(Node):
             ]
         )
 
-        self.top_x = self.get_parameter("camera.extrinsic_camera_calibration.top_x").get_parameter_value().integer_value
-        self.top_y = self.get_parameter("camera.extrinsic_camera_calibration.top_y").get_parameter_value().integer_value
-        self.bottom_x = self.get_parameter("camera.extrinsic_camera_calibration.bottom_x").get_parameter_value().integer_value
-        self.bottom_y = self.get_parameter("camera.extrinsic_camera_calibration.bottom_y").get_parameter_value().integer_value
+        self.top_x = self.get_parameter(
+            "camera.extrinsic_camera_calibration.top_x").get_parameter_value().integer_value
+        self.top_y = self.get_parameter(
+            "camera.extrinsic_camera_calibration.top_y").get_parameter_value().integer_value
+        self.bottom_x = self.get_parameter(
+            "camera.extrinsic_camera_calibration.bottom_x").get_parameter_value().integer_value
+        self.bottom_y = self.get_parameter(
+            "camera.extrinsic_camera_calibration.bottom_y").get_parameter_value().integer_value
 
-        self.is_calibration_mode = self.get_parameter("is_extrinsic_camera_calibration_mode").get_parameter_value().bool_value
+        self.is_calibration_mode = self.get_parameter(
+            "is_extrinsic_camera_calibration_mode").get_parameter_value().bool_value
 
         if self.is_calibration_mode:
             self.add_on_set_parameters_callback(self.cbGetImageProjectionParam)
@@ -54,58 +60,68 @@ class ImageProjection(Node):
         self.pub_image_type = "compressed"        # "compressed" / "raw"
 
         if self.sub_image_type == "compressed":
-            # subscribes compressed image 
+            # subscribes compressed image
             self.sub_image_original = self.create_subscription(
-                CompressedImage, 
-                '/camera/image_input/compressed', 
-                self.cbImageProjection, 
+                CompressedImage,
+                '/camera/image_input/compressed',
+                self.cbImageProjection,
                 1
             )
         elif self.sub_image_type == "raw":
-            # subscribes raw image 
+            # subscribes raw image
             self.sub_image_original = self.create_subscription(
-                Image, 
-                '/camera/image_input', 
-                self.cbImageProjection, 
+                Image,
+                '/camera/image_input',
+                self.cbImageProjection,
                 1
             )
 
         if self.pub_image_type == "compressed":
-            # publishes ground-project image in compressed type 
-            self.pub_image_projected = self.create_publisher(CompressedImage, '/camera/image_output/compressed', 1)
+            # publishes ground-project image in compressed type
+            self.pub_image_projected = self.create_publisher(
+                CompressedImage,
+                '/camera/image_output/compressed',
+                1
+            )
         elif self.pub_image_type == "raw":
-            # publishes ground-project image in raw type 
+            # publishes ground-project image in raw type
             self.pub_image_projected = self.create_publisher(Image, '/camera/image_output', 1)
 
         if self.is_calibration_mode:
             if self.pub_image_type == "compressed":
-                # publishes calibration image in compressed type 
-                self.pub_image_calib = self.create_publisher(CompressedImage, '/camera/image_calib/compressed', 1)
+                # publishes calibration image in compressed type
+                self.pub_image_calib = self.create_publisher(
+                    CompressedImage,
+                    '/camera/image_calib/compressed',
+                    1
+                )
             elif self.pub_image_type == "raw":
-                # publishes calibration image in raw type 
-                self.pub_image_calib = self.create_publisher(Image, '/camera/image_calib', 1)
+                # publishes calibration image in raw type
+                self.pub_image_calib = self.create_publisher(
+                    Image,
+                    '/camera/image_calib',
+                    1
+                )
 
         self.cvBridge = CvBridge()
 
     def cbGetImageProjectionParam(self, parameters):
         for param in parameters:
-          self.get_logger().info(f"Parameter name: {param.name}")
-          self.get_logger().info(f"Parameter value: {param.value}")
-          self.get_logger().info(f"Parameter type: {param.type_}")
-          if param.name == 'camera.extrinsic_camera_calibration.top_x':
-            self.top_x = param.value
-          if param.name == 'camera.extrinsic_camera_calibration.top_y':
-            self.top_y = param.value
-          if param.name == 'camera.extrinsic_camera_calibration.bottom_x':
-            self.bottom_x = param.value
-          if param.name == 'camera.extrinsic_camera_calibration.bottom_y':
-            self.bottom_y = param.value
+            self.get_logger().info(f"Parameter name: {param.name}")
+            self.get_logger().info(f"Parameter value: {param.value}")
+            self.get_logger().info(f"Parameter type: {param.type_}")
+            if param.name == 'camera.extrinsic_camera_calibration.top_x':
+                self.top_x = param.value
+            if param.name == 'camera.extrinsic_camera_calibration.top_y':
+                self.top_y = param.value
+            if param.name == 'camera.extrinsic_camera_calibration.bottom_x':
+                self.bottom_x = param.value
+            if param.name == 'camera.extrinsic_camera_calibration.bottom_y':
+                self.bottom_y = param.value
         self.get_logger().info(f"change: {self.top_x}")
         self.get_logger().info(f"change: {self.top_y}")
         self.get_logger().info(f"change: {self.bottom_x}")
         self.get_logger().info(f"change: {self.bottom_y}")
-
-
         return SetParametersResult(successful=True)
 
     def cbImageProjection(self, msg_img):
@@ -128,14 +144,41 @@ class ImageProjection(Node):
             cv_image_calib = np.copy(cv_image_original)
 
             # draw lines to help setting homography variables
-            cv_image_calib = cv2.line(cv_image_calib, (160 - top_x, 180 - top_y), (160 + top_x, 180 - top_y), (0, 0, 255), 1)
-            cv_image_calib = cv2.line(cv_image_calib, (160 - bottom_x, 120 + bottom_y), (160 + bottom_x, 120 + bottom_y), (0, 0, 255), 1)
-            cv_image_calib = cv2.line(cv_image_calib, (160 + bottom_x, 120 + bottom_y), (160 + top_x, 180 - top_y), (0, 0, 255), 1)
-            cv_image_calib = cv2.line(cv_image_calib, (160 - bottom_x, 120 + bottom_y), (160 - top_x, 180 - top_y), (0, 0, 255), 1)
+            cv_image_calib = cv2.line(
+                cv_image_calib,
+                (160 - top_x, 180 - top_y),
+                (160 + top_x, 180 - top_y),
+                (0, 0, 255),
+                1
+            )
+            cv_image_calib = cv2.line(
+                cv_image_calib,
+                (160 - bottom_x, 120 + bottom_y),
+                (160 + bottom_x, 120 + bottom_y),
+                (0, 0, 255),
+                1
+            )
+            cv_image_calib = cv2.line(
+                cv_image_calib,
+                (160 + bottom_x, 120 + bottom_y),
+                (160 + top_x, 180 - top_y),
+                (0, 0, 255),
+                1
+            )
+            cv_image_calib = cv2.line(
+                cv_image_calib,
+                (160 - bottom_x, 120 + bottom_y),
+                (160 - top_x, 180 - top_y),
+                (0, 0, 255),
+                1
+            )
 
             if self.pub_image_type == "compressed":
                 # publishes calibration image in compressed type
-                self.pub_image_calib.publish(self.cvBridge.cv2_to_compressed_imgmsg(cv_image_calib, "jpg"))
+                self.pub_image_calib.publish(
+                    self.cvBridge.cv2_to_compressed_imgmsg(
+                        cv_image_calib,
+                        "jpg"))
 
             elif self.pub_image_type == "raw":
                 # publishes calibration image in raw type
@@ -144,9 +187,14 @@ class ImageProjection(Node):
         # adding Gaussian blur to the image of original
         cv_image_original = cv2.GaussianBlur(cv_image_original, (5, 5), 0)
 
-        ## homography transform process
+        # homography transform process
         # selecting 4 points from the original image
-        pts_src = np.array([[160 - top_x, 180 - top_y], [160 + top_x, 180 - top_y], [160 + bottom_x, 120 + bottom_y], [160 - bottom_x, 120 + bottom_y]])
+        pts_src = np.array([
+            [160 - top_x, 180 - top_y],
+            [160 + top_x, 180 - top_y],
+            [160 + bottom_x, 120 + bottom_y],
+            [160 - bottom_x, 120 + bottom_y]
+        ])
 
         # selecting 4 points from image that will be transformed
         pts_dst = np.array([[200, 0], [800, 0], [800, 600], [200, 600]])

@@ -3,6 +3,7 @@ from launch_ros.actions import Node
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
+
 def generate_launch_description():
 
     composable_nodes = [
@@ -11,11 +12,7 @@ def generate_launch_description():
             plugin='image_proc::RectifyNode',
             name='rectify_node',
             namespace='camera',
-            parameters=[{'queue_size': 20}],
-            # remappings=[
-            #     ('image', 'image'),
-            #     ('image_rect', 'image_rect')
-            # ]
+            parameters=[{'queue_size': 20}]
         ),
 
         ComposableNode(
@@ -29,48 +26,40 @@ def generate_launch_description():
             ]
         )
     ]
-    return LaunchDescription([
 
-        Node(
-            package='image_transport',
-            executable='republish',
-            name='republish',
-            output='screen',
-            #parameters=['compressed','raw'],
-            arguments=[
-                'compressed',            # 입력 이미지 형식: 압축된 이미지 (CompressedImage)
-                'raw'                    # 출력 이미지 형식: 원시 이미지 (Image)
-            ],
-            remappings=[
-                ('in/compressed', '/camera/image_raw/compressed'), 
-                ('out', '/camera/image')]
-        ),
-        # 그룹 안의 토픽 도구 릴레이 노드
-        Node(
-            package='topic_tools',
-            executable='relay',
-            name='relay_camera_info',
-            output='screen',
-            arguments=['/camera/camera_info', '/camera/camera_info']
-        ),
-        
-        # 이미지 보정 노드
-        # Node(
-        #     package='image_proc',
-        #     executable='image_proc',
-        #     namespace='camera',
-        #     #name='image_proc',
-        #     output='screen',
-        #     parameters=[{'queue_size': 20}],
-        #     remappings=[('image_raw', 'image')],
-        #     arguments=['--ros-args --remap _approximate_sync:=true']
-        # ),
-        ComposableNodeContainer(
+    republish_node = Node(
+        package='image_transport',
+        executable='republish',
+        name='republish',
+        output='screen',
+        arguments=[
+            'compressed',
+            'raw'],
+        remappings=[
+            ('in/compressed',
+                '/camera/image_raw/compressed'),
+            ('out',
+                '/camera/image')]
+    )
+
+    relay_node = Node(
+        package='topic_tools',
+        executable='relay',
+        name='relay_camera_info',
+        output='screen',
+        arguments=['/camera/camera_info', '/camera/camera_info']
+    )
+
+    image_proc_container = ComposableNodeContainer(
         name='image_proc_container',
         namespace='camera',
         package='rclcpp_components',
         executable='component_container',
         composable_node_descriptions=composable_nodes,
-        )
+    )
 
+    return LaunchDescription([
+        republish_node,
+        relay_node,
+        image_proc_container
     ])

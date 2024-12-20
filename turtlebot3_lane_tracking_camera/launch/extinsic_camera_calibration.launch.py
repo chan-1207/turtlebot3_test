@@ -1,16 +1,18 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument,LogInfo
+from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 
 
-
 def generate_launch_description():
-   
-    calibration_mode_arg=DeclareLaunchArgument('calibration_mode', default_value='False', description="calibration mode type [Ture, False]")
-    calibration_mode=LaunchConfiguration('calibration_mode')
+
+    calibration_mode_arg = DeclareLaunchArgument(
+        'calibration_mode',
+        default_value='False',
+        description="calibration mode type [Ture, False]")
+    calibration_mode = LaunchConfiguration('calibration_mode')
 
     compensation_param = os.path.join(
         get_package_share_directory('turtlebot3_lane_tracking_camera'),
@@ -18,7 +20,7 @@ def generate_launch_description():
         'extrinsic_calibration',
         'compensation.yaml'
         )
-    
+
     projection_param = os.path.join(
         get_package_share_directory('turtlebot3_lane_tracking_camera'),
         'calibration',
@@ -26,7 +28,6 @@ def generate_launch_description():
         'projection.yaml'
         )
 
-    # image_projection 노드 정의
     image_projection_node = Node(
         package='turtlebot3_lane_tracking_camera',
         executable='image_projection.py',
@@ -35,9 +36,7 @@ def generate_launch_description():
         output='screen',
         parameters=[
             projection_param,
-            {
-            'is_extrinsic_camera_calibration_mode': calibration_mode
-            }            
+            {'is_extrinsic_camera_calibration_mode': calibration_mode}
         ],
         remappings=[
             ('/camera/image_input', '/camera/image_rect_color'),
@@ -47,10 +46,9 @@ def generate_launch_description():
             ('/camera/image_calib', '/camera/image_extrinsic_calib'),
             ('/camera/image_calib/compressed', '/camera/image_extrinsic_calib/compressed')
         ],
-    
+
     )
 
-    # image_compensation_projection 노드 정의
     image_compensation_projection_node = Node(
         package='turtlebot3_lane_tracking_camera',
         executable='image_compensation.py',
@@ -70,10 +68,8 @@ def generate_launch_description():
         ]
     )
 
-    # LaunchDescription 반환
     return LaunchDescription([
         calibration_mode_arg,
-        #image_compensation_node,
         image_projection_node,
         image_compensation_projection_node
     ])
