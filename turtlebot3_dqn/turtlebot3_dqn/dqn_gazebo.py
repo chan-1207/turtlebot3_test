@@ -65,64 +65,64 @@ class GazeboInterface(Node):
         )
 
     def spawn_entity(self, x: float, y: float, z: float = 0.0):
-        service_name = "/world/dqn/create"
+        service_name = '/world/dqn/create'
         package_share = get_package_share_directory('turtlebot3_gazebo')
         model_path = os.path.join(package_share, 'models', 'turtlebot3_dqn_world', 'goal_box', 'model.sdf')
 
         req = (
-            f'sdf_filename: "{model_path}", '
+            f'sdf_filename: "{model_path}, '
             f'name: "{self.entity_name}", '
             f'pose: {{ position: {{ x: {x}, y: {y}, z: {z} }} }}'
         )
         cmd = [
-            "gz", "service",
-            "-s", service_name,
-            "--reqtype", "gz.msgs.EntityFactory",
-            "--reptype", "gz.msgs.Boolean",
-            "--timeout", "1000",
-            "--req", req
+            'gz', 'service',
+            '-s', service_name,
+            '--reqtype', 'gz.msgs.EntityFactory',
+            '--reptype', 'gz.msgs.Boolean',
+            '--timeout', '1000',
+            '--req', req
         ]
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
-            print(f"[✓] Spawn Entity at ({x}, {y}, {z})")
+            print(f'[✓] Spawn Entity at ({x}, {y}, {z})')
         except subprocess.CalledProcessError as e:
             pass
 
     def delete_entity(self):
-        service_name = "/world/dqn/remove"
-        req = f'name: "{self.entity_name}", type: 2'
+        service_name = '/world/dqn/remove'
+        req = f'name: {self.entity_name}, type: 2'
         cmd = [
-            "gz", "service",
-            "-s", service_name,
-            "--reqtype", "gz.msgs.Entity",
-            "--reptype", "gz.msgs.Boolean",
-            "--timeout", "1000",
-            "--req", req
+            'gz', 'service',
+            '-s', service_name,
+            '--reqtype', 'gz.msgs.Entity',
+            '--reptype', 'gz.msgs.Boolean',
+            '--timeout', '1000',
+            '--req', req
         ]
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
-            print(f"[✓] Delete Entity")
+            print(f'[✓] Delete Entity')
         except subprocess.CalledProcessError as e:
             pass
 
     def reset_burger(self):
-        service_name_delete = "/world/dqn/remove"
+        service_name_delete = '/world/dqn/remove'
         req_delete = 'name: "burger", type: 2'
         cmd_delete = [
-            "gz", "service",
-            "-s", service_name_delete,
-            "--reqtype", "gz.msgs.Entity",
-            "--reptype", "gz.msgs.Boolean",
-            "--timeout", "1000",
-            "--req", req_delete
+            'gz', 'service',
+            '-s', service_name_delete,
+            '--reqtype', 'gz.msgs.Entity',
+            '--reptype', 'gz.msgs.Boolean',
+            '--timeout', '1000',
+            '--req', req_delete
         ]
         try:
             subprocess.run(cmd_delete, check=True, stdout=subprocess.DEVNULL)
-            print(f"[✓] Delete Burger")
+            print(f'[✓] Delete Burger')
         except subprocess.CalledProcessError as e:
             pass
         time.sleep(0.2)
-        service_name_spawn = "/world/dqn/create"
+        service_name_spawn = '/world/dqn/create'
         package_share = get_package_share_directory('turtlebot3_gazebo')
         model_path = os.path.join(package_share, 'models', 'turtlebot3_burger', 'model.sdf')
         req_spawn = (
@@ -131,16 +131,16 @@ class GazeboInterface(Node):
             f'pose: {{ position: {{ x: 0.0, y: 0.0, z: 0.0 }} }}'
         )
         cmd_spawn = [
-            "gz", "service",
-            "-s", service_name_spawn,
-            "--reqtype", "gz.msgs.EntityFactory",
-            "--reptype", "gz.msgs.Boolean",
-            "--timeout", "1000",
-            "--req", req_spawn
+            'gz', 'service',
+            '-s', service_name_spawn,
+            '--reqtype', 'gz.msgs.EntityFactory',
+            '--reptype', 'gz.msgs.Boolean',
+            '--timeout', '1000',
+            '--req', req_spawn
         ]
         try:
             subprocess.run(cmd_spawn, check=True, stdout=subprocess.DEVNULL)
-            print(f"[✓] Spawn Burger")
+            print(f'[✓] Spawn Burger')
         except subprocess.CalledProcessError as e:
             pass
 
