@@ -100,7 +100,7 @@ class GazeboInterface(Node):
         ]
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
-            print(f'[✓] Delete Entity')
+            print('[✓] Delete Entity')
         except subprocess.CalledProcessError:
             pass
 
@@ -117,7 +117,7 @@ class GazeboInterface(Node):
         ]
         try:
             subprocess.run(cmd_delete, check=True, stdout=subprocess.DEVNULL)
-            print(f'[✓] Delete Burger')
+            print('[✓] Delete Burger')
         except subprocess.CalledProcessError:
             pass
         time.sleep(0.2)
@@ -139,7 +139,7 @@ class GazeboInterface(Node):
         ]
         try:
             subprocess.run(cmd_spawn, check=True, stdout=subprocess.DEVNULL)
-            print(f'[✓] Spawn Burger')
+            print('[✓] Spawn Burger')
         except subprocess.CalledProcessError:
             pass
 
