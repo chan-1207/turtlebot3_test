@@ -17,7 +17,7 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}    # 설치 경로
 )
 
-install(DIRECTORY launch/
+install(DIRECTORY launch/ 
   DESTINATION share/${PROJECT_NAME}/launch
 )
 
