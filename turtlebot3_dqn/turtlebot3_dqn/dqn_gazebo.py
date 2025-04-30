@@ -19,6 +19,7 @@
 
 import os
 import random
+import subprocess
 import sys
 import time
 
@@ -26,8 +27,6 @@ from ament_index_python.packages import get_package_share_directory
 import rclpy
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.node import Node
-import subprocess
-from std_srvs.srv import Empty
 
 from turtlebot3_msgs.srv import Goal
 
@@ -41,8 +40,6 @@ class GazeboInterface(Node):
         self.entity_name = 'goal_box'
         self.entity_pose_x = 0.5
         self.entity_pose_y = 0.0
-
-        self.reset_simulation_client = self.create_client(Empty, 'reset_simulation')
 
         self.callback_group = MutuallyExclusiveCallbackGroup()
         self.initialize_env_service = self.create_service(
@@ -67,7 +64,9 @@ class GazeboInterface(Node):
     def spawn_entity(self, x: float, y: float, z: float = 0.0):
         service_name = '/world/dqn/create'
         package_share = get_package_share_directory('turtlebot3_gazebo')
-        model_path = os.path.join(package_share, 'models', 'turtlebot3_dqn_world', 'goal_box', 'model.sdf')
+        model_path = os.path.join(
+            package_share, 'models', 'turtlebot3_dqn_world', 'goal_box', 'model.sdf'
+        )
 
         req = (
             f'sdf_filename: "{model_path}, '
@@ -85,7 +84,7 @@ class GazeboInterface(Node):
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
             print(f'[✓] Spawn Entity at ({x}, {y}, {z})')
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             pass
 
     def delete_entity(self):
@@ -102,7 +101,7 @@ class GazeboInterface(Node):
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
             print(f'[✓] Delete Entity')
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             pass
 
     def reset_burger(self):
@@ -119,7 +118,7 @@ class GazeboInterface(Node):
         try:
             subprocess.run(cmd_delete, check=True, stdout=subprocess.DEVNULL)
             print(f'[✓] Delete Burger')
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             pass
         time.sleep(0.2)
         service_name_spawn = '/world/dqn/create'
@@ -141,7 +140,7 @@ class GazeboInterface(Node):
         try:
             subprocess.run(cmd_spawn, check=True, stdout=subprocess.DEVNULL)
             print(f'[✓] Spawn Burger')
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             pass
 
     def task_succeed_callback(self, request, response):
