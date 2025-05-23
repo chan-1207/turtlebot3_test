@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>turtlebot3_home_service_challenge_tools</name>
+  <version>1.0.2</version>
+  <description>
+    turtlebot3_home_service_challenge_tools
+  </description>
+  <maintainer email="pyo@robotis.com">Pyo</maintainer>
+  <license>Apache 2.0</license>
+  <url type="website">http://wiki.ros.org/turtlebot3</url>
+  <url type="website">http://turtlebot3.robotis.com</url>
+  <url type="repository">https://github.com/ROBOTIS-GIT/turtlebot3_home_service_challenge</url>
+  <url type="bugtracker">https://github.com/ROBOTIS-GIT/turtlebot3_home_service_challenge/issues</url>
+  <author email="kmjung@robotis.com">kayman</author>
+  <author email="ashekim@robotis.com">Ashe Kim</author>
+  <author email="dddoggi1207@gmail.com">ChanHyeong Lee</author>
+  <depend>ament_index_python</depend>
+  <depend>controller_manager</depend>
+  <depend>nav2_bt_navigator</depend>
+  <depend>nav2_bringup</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>rviz2</depend>
+  <depend>xacro</depend>
+  <depend>yaml</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
