@@ -17,8 +17,6 @@
   <author email="dddoggi1207@gmail.com">ChanHyeong Lee</author>
   <depend>ament_index_python</depend>
   <depend>controller_manager</depend>
-  <depend>nav2_bt_navigator</depend>
-  <depend>nav2_bringup</depend>
   <depend>robot_state_publisher</depend>
   <depend>rviz2</depend>
   <depend>xacro</depend>
